@@ -39,12 +39,13 @@ app.get('/health/readiness',function(req,res){
   });  
 
 app.get('/', function (req, res) {
-
+  
   var clientHostname = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-  res.send(`Dont look at my tights |^| @@ batman fan boy :-D ,New Version, My Image is ${image}:${tag} , the Server is ${host} accessed from ${clientHostname} `);
-
-  console.log(`Someone accessed me! --> from ${clientHostname}`)
+  // Use the 'sendFile' method to send the HTML file as a response
+  res.sendFile(__dirname + '/html/index.html');
+  
+    console.log(`Someone accessed me! --> from ${clientHostname}`)
 });
 
 app.get('/test1', function (req, res) {
