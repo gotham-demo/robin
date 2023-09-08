@@ -3,6 +3,8 @@ var tag = process.env.TAG
 var host = process.env.HOSTNAME
 var port = process.env.PORT || 8080;
 var express = require('express');
+const path = require('path');
+const fs = require('fs'); // Add this line to require the 'fs' module
 const Prometheus = require('prom-client');
 const register = new Prometheus.Registry();
 
@@ -22,7 +24,44 @@ const http_request_counter = new Prometheus.Counter({
 register.registerMetric(http_request_counter);
 
 
-   
+
+// Define a route to serve images by name
+app.get('/image/:imageName', function (req, res) {
+  const imageName = req.params.imageName; // Get the image name from the URL parameter
+  const imagePath = path.join(__dirname, 'img', imageName);
+
+  // Check if the image file exists
+  if (fs.existsSync(imagePath)) {
+    // Set the content type based on the image file extension
+    const contentType = getContentType(imageName);
+    res.contentType(contentType);
+
+    // Use 'sendFile' to serve the image
+    res.sendFile(imagePath);
+  } else {
+    // Return a 404 error if the image does not exist
+    res.status(404).send('Image not found');
+  }
+});
+
+// Function to determine content type based on file extension
+function getContentType(imageName) {
+  const extension = path.extname(imageName);
+  switch (extension) {
+    case '.png':
+      return 'image/png';
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg';
+    case '.gif':
+      return 'image/gif';
+    // Add more cases for other image formats as needed
+    default:
+      return 'application/octet-stream';
+  }
+}
+
+
    
 // Health Probe - Application Liveliness
 app.get('/health/liveliness',function(req,res){
@@ -39,7 +78,7 @@ app.get('/health/readiness',function(req,res){
   });  
 
 app.get('/', function (req, res) {
-  
+
   var clientHostname = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
   // Use the 'sendFile' method to send the HTML file as a response
