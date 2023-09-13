@@ -91,7 +91,7 @@ app.get('/', function (req, res) {
 
 app.get('/test1', function (req, res) {
 
-  res.send(`This is Test1, All Good`);
+  res.send(`This is Test1, Hi Robin`);
 
   console.log(`Someone accessed Test1 Path!`)
 });
